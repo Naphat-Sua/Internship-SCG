@@ -1,11 +1,22 @@
-import numpy as np
-import scipy.io
+import os
 import pickle
 
-VGG_PATH = "D:\MyProject\machine-learning\Convolutional_neural_network\imagenet-vgg-verydeep-19"
+import numpy as np
+import scipy.io
+
 # Use VGG-Network: https://arxiv.org/abs/1409.1556 (paper)
-# http://www.vlfeat.org/matconvnet/pretrained/ (.mat)
-dataVGG = scipy.io.loadmat(VGG_PATH)	
+# Download imagenet-vgg-verydeep-19.mat from
+# http://www.vlfeat.org/matconvnet/pretrained/ and set VGG_PATH to its location
+# (or export the VGG_PATH environment variable).
+VGG_PATH = os.environ.get("VGG_PATH", "imagenet-vgg-verydeep-19.mat")
+if not os.path.exists(VGG_PATH):
+    raise SystemExit(
+        "VGG model file not found: %s\n"
+        "Download imagenet-vgg-verydeep-19.mat from "
+        "http://www.vlfeat.org/matconvnet/pretrained/ and set the VGG_PATH "
+        "environment variable to its location." % VGG_PATH
+    )
+dataVGG = scipy.io.loadmat(VGG_PATH)
 dataLayer = dataVGG['layers'][0]
 assert dataLayer.shape == (43,) # all layer
 
@@ -16,7 +27,8 @@ assert mean.shape == (224, 224, 3)
 # the average color: Red, Green, Blue should be [123.68, 116.779, 103.939])
 meanColor = np.mean(mean, axis=(0, 1))
 
-W={}; B={}
+W = {}
+B = {}
 for index, layer in enumerate(dataLayer):
 	dd = layer[0][0]	
 	if len(dd) <= 2: 

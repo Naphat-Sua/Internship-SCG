@@ -1,7 +1,6 @@
-import os
-import numpy as np
-import scipy.io
 import math
+
+import numpy as np
 from matplotlib import pyplot as plt
 
 from sklearn import datasets
@@ -9,7 +8,7 @@ from sklearn.model_selection import train_test_split
 
 def plotExampleImg(title,imageData, Ydigits):
 	fig = plt.figure()
-	plt.gcf().canvas.set_window_title(title)
+	plt.gcf().canvas.manager.set_window_title(title)
 	fig.set_facecolor('#FFFFFF')
 	axList = []
 	for position in range (1,11):
@@ -26,13 +25,13 @@ def plotExampleImg(title,imageData, Ydigits):
 	plt.axis('off')
 	plt.show()
 	
-def example1():	
-	# Other example: iris = fetch_mldata('iris', data_home=test_data_home)
-	# test_data_home is directory for saving mat file
-	mnist = datasets.fetch_mldata("MNIST Original")	
+def example1():
+	# fetch_mldata was removed from sklearn; fetch_openml is the replacement
+	# (downloads MNIST on first run and caches it under ~/scikit_learn_data)
+	mnist = datasets.fetch_openml("mnist_784", version=1, as_frame=False)
 	x = mnist.data
-	y = mnist.target
-	print(mnist.keys()) # dict_keys(['COL_NAMES', 'data', 'target', 'DESCR'])
+	y = mnist.target.astype(int)
+	print(mnist.keys())
 	
 	x_train, x_test, y_train, y_test = train_test_split(x, y,
                                                         test_size=0.33,
@@ -67,24 +66,18 @@ def example2():
 	imageData = x_train.reshape((-1, W, W))	# picture 8 x 8
 	plotExampleImg("Example: 2", imageData, y_train)														
 
-from tensorflow.contrib.learn.python.learn.datasets.mnist import read_data_sets
 def example3():
-	# mnist.test : 10K images + labels
-	# mnist.train : 60K images + labels
-	# 'data' is the directory that save all datasets
-	mnist = read_data_sets("data", one_hot=True, reshape=False, validation_size=0)
-	# batches of 100 images with 100 labels
-	batch_X, batch_Y = mnist.train.next_batch(100)
-	assert batch_X.shape == (100, 28, 28, 1)
-	assert batch_Y.shape == (100, 10)
-	
-	# Y label is encoded : for example 9 is [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-	batch_temp = np.argsort(batch_Y)
-	# decoded
-	batch_label = np.array([val[9] for val in batch_temp])
-	assert batch_label.shape == (100,)
-	
-	batch_X = batch_X.reshape(-1,28 , 28)	# 100 x 28 x 28
+	# tensorflow.contrib was removed in TensorFlow 2;
+	# tf.keras.datasets.mnist is the replacement
+	from tensorflow.keras.datasets import mnist
+
+	(x_train, y_train), (x_test, y_test) = mnist.load_data()
+	assert x_train.shape == (60000, 28, 28)
+	assert y_train.shape == (60000,)
+
+	# take a batch of 100 images with 100 labels
+	batch_X, batch_label = x_train[:100], y_train[:100]
+
 	plotExampleImg("Example: 3", batch_X, batch_label)
 
 if __name__ == "__main__":

@@ -2,8 +2,9 @@ from typing import List, Tuple
 
 import numpy as np
 from filterpy.common import Q_discrete_white_noise
-from filterpy.kalman import KalmanFilter, logpdf
-from scipy.ndimage.filters import gaussian_filter
+from filterpy.kalman import KalmanFilter
+from filterpy.stats import logpdf
+from scipy.ndimage import gaussian_filter
 
 # Fixbug
 def dot3(a, b, c):
@@ -122,7 +123,7 @@ class Window:
                 np.sum(column_scores[self.x_begin('x_measured') - x_offset: self.x_end('x_measured') - x_offset])
             noise_magnitude = np.sum(column_scores) - window_magnitude
             signal_noise_ratio = \
-                window_magnitude / (window_magnitude + noise_magnitude) if window_magnitude is not 0 else 0
+                window_magnitude / (window_magnitude + noise_magnitude) if window_magnitude != 0 else 0
 
             # Filter measurement and set position
             if signal_noise_ratio < 0.6 or self.filter.loglikelihood(self.x_measured) < min_log_likelihood:

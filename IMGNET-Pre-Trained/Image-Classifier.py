@@ -30,14 +30,14 @@ https://arxiv.org/abs/1512.00567 ( Inception v3 model )
 # imagenet class index: 'https://s3.amazonaws.com/deep-learning-models/image-models/imagenet_class_index.json'
 # thank you library: https://keras.io/applications
 # source code of library: https://github.com/fchollet/deep-learning-models
-from keras.applications.vgg16 import VGG16
-from keras.applications.vgg19 import VGG19
-from keras.applications.resnet50 import ResNet50
-from keras.applications.inception_v3 import InceptionV3
-from keras.applications.xception import Xception
-from keras.preprocessing import image
-from keras.applications.imagenet_utils import decode_predictions
-from keras.models import Model
+from tensorflow.keras.applications.vgg16 import VGG16
+from tensorflow.keras.applications.vgg19 import VGG19
+from tensorflow.keras.applications.resnet50 import ResNet50
+from tensorflow.keras.applications.inception_v3 import InceptionV3
+from tensorflow.keras.applications.xception import Xception
+from tensorflow.keras.preprocessing import image
+from tensorflow.keras.applications.imagenet_utils import decode_predictions
+from tensorflow.keras.models import Model
 
 def prepareImage(img, modelName):
 	# dim_ordering == 'th': backend is Theano , 	chanel x heigh x width
@@ -52,20 +52,20 @@ def prepareImage(img, modelName):
 	# Convert 'RGB'->'BGR'
 	# and then subtract color mean values (BGR): [123.68, 116.779, 103.939]
 	if modelName == 'VGG16':
-		from keras.applications.vgg16 import preprocess_input
+		from tensorflow.keras.applications.vgg16 import preprocess_input
 	elif modelName == 'VGG19':
-		from keras.applications.vgg19 import preprocess_input
+		from tensorflow.keras.applications.vgg19 import preprocess_input
 	elif modelName == 'ResNet50':
-		from keras.applications.resnet50 import preprocess_input
+		from tensorflow.keras.applications.resnet50 import preprocess_input
 		
 	# select function: preprocess_input for InceptionV3 and Xception model (same functions)
 	# imgData /= 255.
 	# imgData -= 0.5
 	# imgData *= 2.
 	elif modelName == 'InceptionV3':
-		from keras.applications.inception_v3 import preprocess_input
+		from tensorflow.keras.applications.inception_v3 import preprocess_input
 	elif modelName == 'Xception':
-		from keras.applications.xception import preprocess_input
+		from tensorflow.keras.applications.xception import preprocess_input
 	else:
 		raise ValueError
 		
@@ -107,7 +107,7 @@ def showPredict(orgImg, predicted):
 				'%s\n(%.2f)' % (className[index], prop[index]),
 				ha='center', va='bottom', color=col)
 		
-	plt.gcf().canvas.set_window_title('Image classification')
+	plt.gcf().canvas.manager.set_window_title('Image classification')
 	plt.show()
 
 def getPreds_top5(model, imgData):
@@ -156,7 +156,7 @@ def visualizeModel(base_model, imgData, block_name):
 		ax.imshow(_deprocessImg(features[numFilter]))
 		ax.set_axis_off()
 	
-	plt.gcf().canvas.set_window_title('Visualize VGG model')	
+	plt.gcf().canvas.manager.set_window_title('Visualize VGG model')	
 	plt.show()
 
 # test here

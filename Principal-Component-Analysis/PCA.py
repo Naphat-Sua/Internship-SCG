@@ -6,7 +6,6 @@ from sklearn.decomposition import PCA
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 def plotExampleImg(title,imageData, Ydigits):
 	fig = plt.figure()

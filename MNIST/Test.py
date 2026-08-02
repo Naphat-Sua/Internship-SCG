@@ -1,13 +1,13 @@
-from mnist import getDatasets, restoreImg, plotExampleImg, plotPCA2d, encode
+from Dataset import getDatasets, restoreImg, plotExampleImg, plotPCA2d, encode
 
 # For example 1 and 2
-from mnist import train_nearest_neighbors, train_support_vector
+from Dataset import train_nearest_neighbors, train_support_vector
 
-from mnist import trainModel, testModel
-from mnist import build_logistic_regression, build_MLP 		# For example 3 and 4
-from mnist import build_CNN_2D, reshapeCNN2D_Input 			# For example 5
-from mnist import build_CNN_1D, reshapeCNN1D_Input 			# For example 6
-from mnist import getSequenceInput, build_RNN, build_LSTM, build_GRU # For example 7, 8 and 9
+from Dataset import trainModel, testModel
+from Dataset import build_logistic_regression, build_MLP 		# For example 3 and 4
+from Dataset import build_CNN_2D, reshapeCNN2D_Input 			# For example 5
+from Dataset import build_CNN_1D, reshapeCNN1D_Input 			# For example 6
+from Dataset import getSequenceInput, build_RNN, build_LSTM, build_GRU # For example 7, 8 and 9
 
 if __name__ == "__main__":
 	Xtrain, Xtest, Ytrain, Ytest = getDatasets()

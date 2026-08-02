@@ -4,21 +4,24 @@
 # Reference blog: https://oshearesearch.com/index.php/2016/07/01/mnist-generative-adversarial-model-in-keras/
 # Many thanks from ur deep heart
 
-from __future__ import print_function
 import os.path
 
 import numpy as np
-import keras
-from keras.models import Model
-from keras.models import Sequential
-from keras.layers import Input
-from keras.layers.core import Reshape,Dense,Dropout,Activation,Flatten
-from keras.layers.advanced_activations import LeakyReLU
-from keras.layers.convolutional import Conv2D, UpSampling2D
-from keras.layers.normalization import BatchNormalization
-from keras.optimizers import Adam
-from keras.datasets import mnist
-from keras import backend as K
+from tensorflow.keras import backend as K
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.layers import (
+	Activation,
+	BatchNormalization,
+	Conv2D,
+	Dense,
+	Dropout,
+	Flatten,
+	LeakyReLU,
+	Reshape,
+	UpSampling2D,
+)
+from tensorflow.keras.models import Model, Sequential
+from tensorflow.keras.optimizers import Adam
 
 import matplotlib.pyplot as plt
 
@@ -28,16 +31,18 @@ discriminative_h5_file = "mnist_discriminator.h5"
 def load_weights(model, h5_file):
 	try:
 		if os.path.exists(h5_file):
-			print("\nLoaded model(weights) from file: %s" % (self.h5_file))
-			model.load_weights(self.h5_file)	
+			print("\nLoaded model(weights) from file: %s" % (h5_file))
+			model.load_weights(h5_file)
 	except Exception as inst:
 		print(inst)
 	return model
 			
 # Build Discriminative model 
 def build_discriminative_model(shape):
+	from tensorflow.keras import Input as KInput
 	model = Sequential()
-	model.add(Conv2D(filters=256, kernel_size=(5, 5), strides=(2, 2), padding="same", activation='relu', input_shape=shape))
+	model.add(KInput(shape=shape))
+	model.add(Conv2D(filters=256, kernel_size=(5, 5), strides=(2, 2), padding="same", activation='relu'))
 	model.add(LeakyReLU(0.2))
 	model.add(Dropout(0.25))
 	model.add(Conv2D(filters=512, kernel_size=(5, 5), strides=(2, 2), padding="same", activation='relu'))
@@ -64,17 +69,17 @@ def enable_train(discriminator, is_train=True):
 
 #build Generative model ...
 def build_generative_model(discriminator, shape=(100, )):
+	from tensorflow.keras import Input as KInput
 	generator = Sequential()
-	generator.add(Dense(input_shape=shape, units=200 * 14 * 14))
+	generator.add(KInput(shape=shape))
+	generator.add(Dense(units=200 * 14 * 14))
 	generator.add(BatchNormalization())
 	generator.add(Activation('relu'))
-	
-	if K.image_dim_ordering() == 'th': 
-		# backend is Theano
+
+	if K.image_data_format() == 'channels_first':
 		# Image dimension = chanel x row x column
 		generator.add(Reshape( (200, 14, 14) ))
-	else: 
-		# 'tf' backend is Tensorflow
+	else:
 		# Image dimension = row x column x chanel
 		generator.add(Reshape( (14, 14, 200) ))
 		
@@ -120,14 +125,12 @@ def save_genImage(generator, n_ex=16,dim=(4,4), figsize=(10,10) ):
 	for i in range(generated_images.shape[0]):
 		plt.subplot(dim[0],dim[1],i+1)
 		img = []
-		if K.image_dim_ordering() == 'th': 
-			# backend is Theano
-			# Image dimension = chanel x row x column 
+		if K.image_data_format() == 'channels_first':
+			# Image dimension = chanel x row x column
 			img = generated_images[i,0,:,:]
 		else:
-			# 'tf' backend is Tensorflow
 			# Image dimension = row x column x chanel
-			img = generated_images[i,:,:,0] # tensorflow
+			img = generated_images[i,:,:,0]
 		plt.imshow(img)
 		plt.axis('off')
 	plt.tight_layout()	
@@ -139,8 +142,8 @@ def save_genImage(generator, n_ex=16,dim=(4,4), figsize=(10,10) ):
 acc_dis = []
 acc_gen = []
 
-def train_GAN(X_train, discriminator, generator, nb_epoch=5000, num_sampling=32):
-	for e in range(nb_epoch): 
+def train_GAN(X_train, discriminator, generator, train_generator, nb_epoch=5000, num_sampling=32):
+	for e in range(nb_epoch):
 		print("\n===================== Iterator : %s===================" % e)
 		if e == 0: num_sampling = 300 # frist training		
 		# create noise 
@@ -202,17 +205,15 @@ def train_GAN(X_train, discriminator, generator, nb_epoch=5000, num_sampling=32)
 			discriminator.save(discriminative_h5_file)
 			generator.save(generative_h5_file)			
 
-def reshapeCNNInput(X): 
-	exampleNum, W, W = X.shape
+def reshapeCNNInput(X):
+	exampleNum, H, W = X.shape
 	# change shape of image data
-	if K.image_dim_ordering() == 'th': 
-		# backend is Theano
+	if K.image_data_format() == 'channels_first':
 		# Image dimension = chanel x row x column (chanel = 1, if it is RGB: chanel = 3)
-		XImg = X.reshape(exampleNum, 1, W, W)
-	else: 
-		# 'tf' backend is Tensorflow
+		XImg = X.reshape(exampleNum, 1, H, W)
+	else:
 		# Image dimension = row x column x chanel (chanel = 1, if it is RGB: chanel = 3)
-		XImg = X.reshape(exampleNum, W, W, 1)		
+		XImg = X.reshape(exampleNum, H, W, 1)
 	return XImg
 	
 def prepare_Dataset():
@@ -241,7 +242,7 @@ if __name__ == "__main__":
 	generator, train_generator = build_generative_model(discriminator)
 	
 	print("Training....")
-	train_GAN(X_train, discriminator, generator, nb_epoch=1000, num_sampling=32)
+	train_GAN(X_train, discriminator, generator, train_generator, nb_epoch=1000, num_sampling=32)
 
 	#++++++++++++++++++++++++++++show model summary++++++++++++++++++++++++++++++
 	print(generator.summary())

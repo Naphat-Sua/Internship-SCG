@@ -41,17 +41,17 @@ ax2.set_ylim([-0.1, 1.1])
 ax3.set_ylim([-1.1, 1.1])
 #ax4.set_ylim([-0.2, x])
 
-def diplay_xy_axis(ax):
+def display_xy_axis(ax):
     #ax.set_aspect('equal')
     ax.grid(True, which='both')
     ax.axhline(y=0, color='k')
     ax.axvline(x=0, color='k')
 
-diplay_xy_axis(ax1)
-diplay_xy_axis(ax2)
-diplay_xy_axis(ax3)
-diplay_xy_axis(ax4)
-diplay_xy_axis(ax5)
+display_xy_axis(ax1)
+display_xy_axis(ax2)
+display_xy_axis(ax3)
+display_xy_axis(ax4)
+display_xy_axis(ax5)
 
 # show all graphs
 ax1.plot(x, x,'k-')

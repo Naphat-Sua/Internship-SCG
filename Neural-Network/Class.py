@@ -5,29 +5,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from matplotlib import colors as mcolors
-import matplotlib.mlab as mlab
-import os.path
-import scipy.misc
 
-import time
-import datetime
-
-from sklearn import datasets, svm, metrics
-from sklearn.model_selection import train_test_split
-from sklearn.decomposition import PCA
-
-from matplotlib import pyplot as plt
-from keras.layers.core import Dense, Activation, Dropout, Flatten
-from keras.layers.recurrent import SimpleRNN, LSTM, GRU 
-from keras.models import Sequential
-from keras.regularizers import l2
-from keras import backend as K
-from keras.layers import Conv2D, Conv1D, MaxPooling2D, MaxPooling1D
-import keras
+from tensorflow.keras import Input, optimizers
+from tensorflow.keras.layers import Dense, Activation
+from tensorflow.keras.models import Sequential
 
 # my modules
-from history import TrainingHistory
+from training_history import TrainingHistory
 
 X_train = [[-0.4326, 1.1909], 
 	[3.0, 4.0],
@@ -53,23 +37,23 @@ Y_train = np.array(Y_train)
 X_test, Y_test = X_train, Y_train
 
 def build_MLP(features):
-	model = Sequential()		
-	# L2 is weight regularization penalty, also known as weight decay, or Ridge
-	model.add(Dense(input_dim=features, units=6) )
-	model.add(Activation("tanh"))	
-	model.add(Dense(units=1)) 	
-	# now model.output_shape == (None, 10)
-	# note: `None` is the batch dimension.	
+	model = Sequential()
+	model.add(Input(shape=(features,)))
+	model.add(Dense(units=6))
+	model.add(Activation("tanh"))
+	model.add(Dense(units=1))
+	# now model.output_shape == (None, 1)
+	# note: `None` is the batch dimension.
 	#
 	model.add(Activation("sigmoid"))
-		
+
 	# algorithim to optimize the models (train model)
 	# compute loss with function: binary crossentropy
-	#opt = keras.optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-	opt = keras.optimizers. Adam(lr=0.01, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+	#opt = optimizers.SGD(learning_rate=0.01, momentum=0.9, nesterov=True)
+	opt = optimizers.Adam(learning_rate=0.01, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
 	model.compile(optimizer=opt,
-			  loss='binary_crossentropy',
-			  metrics=['accuracy'])
+				loss='binary_crossentropy',
+				metrics=['accuracy'])
 	return model
 
 model = build_MLP(X_train.shape[1])
@@ -89,8 +73,8 @@ def training_model(model, step_visual=0, visual=None):
 		
 class Visualization():	
 	def __init__(self, model, X_train, Label_train, title, dpi=70):
-		fig = plt.figure(figsize=(19.20,10.80), dpi=dpi)		
-		plt.gcf().canvas.set_window_title(title)
+		fig = plt.figure(figsize=(19.20,10.80), dpi=dpi)
+		fig.canvas.manager.set_window_title(title)
 		fig.set_facecolor('#FFFFFF')
 		ax1 = fig.add_subplot(121)
 		ax2 = fig.add_subplot(222)		

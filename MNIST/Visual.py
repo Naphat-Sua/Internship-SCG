@@ -1,23 +1,16 @@
 # reference code example from: https://github.com/martin-gorner/tensorflow-mnist-tutorial
 
 import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
 
-from keras.models import Sequential
-from keras.layers.core import Dense, Activation, Dropout
-from keras.models import Model
-
-import matplotlib.animation as animation
-import math
-import datetime, time
+from tensorflow.keras import Input
+from tensorflow.keras.models import Model, Sequential
+from tensorflow.keras.layers import Dense, Activation, Dropout
 
 # my modules
-from mnist import getDatasets, restoreImg, plotExampleImg, encode, testModel
-from mnist import build_logistic_regression
-from history import TrainingHistory
-from visual import Visualization		
+from Dataset import getDatasets, restoreImg, encode, testModel
+from training_history import TrainingHistory
+from visualization import Visualization
 
 def pad(image, color_pad=7, x_pad=1, y_pad=3,):			
 	# pad 255 or 0 to image
@@ -47,14 +40,14 @@ def random10Image(Xtrain, Ydigits): # random 10 images
 		randImage.append(digitsImg[randomIndex])
 	return np.array(randImage)
 
-min_max_scaler = preprocessing.MinMaxScaler(feature_range=(0, 125))	
-def combineImage(randImage): # combine 10 images to 1 image			
-	#preprocessing: rescale image from min to max	
-	def preprocessing(image):
-		return min_max_scaler.fit_transform(image)			
-		
-	randImage = restoreImg(randImage)		
-	randImage =[ pad(preprocessing(img)) for img in randImage ]	
+min_max_scaler = preprocessing.MinMaxScaler(feature_range=(0, 125))
+def combineImage(randImage): # combine 10 images to 1 image
+	#rescale image from min to max
+	def rescale(image):
+		return min_max_scaler.fit_transform(image)
+
+	randImage = restoreImg(randImage)
+	randImage =[ pad(rescale(img)) for img in randImage ]
 	img_top = randImage[0]
 	for i in range(1,5):
 		img_top = np.append(img_top, randImage[i], axis=1)	
@@ -63,10 +56,11 @@ def combineImage(randImage): # combine 10 images to 1 image
 		img_bottom = np.append(img_bottom, randImage[i], axis=1)
 	return np.append(img_top, img_bottom, axis=0)
 	
-def build_neural_network(features):		
+def build_neural_network(features):
 	model = Sequential()
-	model.add(Dense(input_dim=features, units=400))
-	# now model.output_shape == (None, 500)
+	model.add(Input(shape=(features,)))
+	model.add(Dense(units=400))
+	# now model.output_shape == (None, 400)
 	# note: `None` is the batch dimension.
 	#
 	model.add(Activation("relu"))
@@ -79,8 +73,8 @@ def build_neural_network(features):
 	# algorithim to train models use RMSprop
 	# compute loss with function: categorical crossentropy
 	model.compile(optimizer='rmsprop',
-			  loss='categorical_crossentropy',
-			  metrics=['accuracy'])	
+				loss='categorical_crossentropy',
+				metrics=['accuracy'])	
 	print(model.summary())
 	return model
 	

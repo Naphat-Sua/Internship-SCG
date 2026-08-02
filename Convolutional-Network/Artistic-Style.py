@@ -28,11 +28,15 @@ I borrowed some code  from [Anish Athalye's Neural Style]
 #https://arxiv.org/abs/1603.08155 (paper)
 
 
-import tensorflow as tf
+# This example was written against the TensorFlow 1 graph API.
+# The compat.v1 shim lets it run unchanged on TensorFlow 2.
+import tensorflow.compat.v1 as tf
 import numpy as np
 import scipy.io
 import time
 from matplotlib import pyplot as plt
+
+tf.disable_v2_behavior()
 
 try:
     reduce
@@ -152,7 +156,8 @@ def getVGGdata():
 	# the average color: Red, Green, Blue should be [123.68, 116.779, 103.939])
 	meanColor = np.mean(mean, axis=(0, 1))
 		
-	W={}; B={}
+	W = {}
+	B = {}
 	for index, name in enumerate(layers):
 		type = name[:4]
 		if type == 'conv':		    
@@ -208,7 +213,7 @@ def createModel(imgInput):
 	conv5_1 = tf.nn.relu(tf.nn.conv2d(pool4,   W['conv5_1'], strides=s1, padding='SAME')+ B['conv5_1'])
 	conv5_2 = tf.nn.relu(tf.nn.conv2d(conv5_1, W['conv5_2'], strides=s1, padding='SAME')+ B['conv5_2'])
 	conv5_3 = tf.nn.relu(tf.nn.conv2d(conv5_2, W['conv5_3'], strides=s1, padding='SAME')+ B['conv5_3'])
-	conv5_4 = tf.nn.relu(tf.nn.conv2d(conv5_3, W['conv5_4'], strides=s1, padding='SAME')+ B['conv5_4'])
+	_conv5_4 = tf.nn.relu(tf.nn.conv2d(conv5_3, W['conv5_4'], strides=s1, padding='SAME')+ B['conv5_4'])  # noqa: F841 (kept for completeness of the VGG graph)
 	
 	return conv4_2, [conv1_1, conv2_1, conv3_1, conv4_1, conv5_1]
 
@@ -222,7 +227,7 @@ def preprocess(imgData, meanColor):
 def getcontentFeature(imgData):	
 	imgData = preprocess(imgData, meanColor)
 	g = tf.Graph()
-	with g.as_default(), g.device('/cpu:0'), tf.Session() as sess:
+	with g.as_default(), g.device('/cpu:0'), tf.Session():
 		# placeholder for a image
 		imgInput = tf.placeholder('float', shape=imgData.shape)
 		
@@ -301,7 +306,7 @@ def trainModel(imgData, contentFeature, allStyleFeautures, allStep):
 			styleGram = allStyleFeautures[index]
 			styleLosses.append(2 * tf.nn.l2_loss(gram - styleGram) / styleGram.size)
 		
-		styleBlendWeights = getStyleBlendWeights();
+		styleBlendWeights = getStyleBlendWeights()
 		styleLoss += STYLE_WEIGHT * styleBlendWeights * reduce(tf.add, styleLosses)
 		
 		# total variation denoising
@@ -309,9 +314,9 @@ def trainModel(imgData, contentFeature, allStyleFeautures, allStep):
 		tv_x_size = _tensor_size(image[:,:,1:,:])
 		tvLoss = TV_WEIGHT * 2 * (
 				(tf.nn.l2_loss(image[:,1:,:,:] - image[:,:imgShape[1]-1,:,:]) /
-				    tv_y_size) +
+					tv_y_size) +
 				(tf.nn.l2_loss(image[:,:,1:,:] - image[:,:,:imgShape[2]-1,:]) /
-				    tv_x_size))
+					tv_x_size))
 		
 		# all loss function
 		loss = contentLoss + styleLoss + tvLoss

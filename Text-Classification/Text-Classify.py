@@ -1,26 +1,45 @@
 # thank you idea from: https://github.com/fchollet/keras/blob/master/examples/reuters_mlp.py
 
-from __future__ import print_function
+import datetime
+import time
 
 import numpy as np
-from sklearn.decomposition import PCA
-from sklearn import metrics
 from matplotlib import pyplot as plt
-import pickle
-import re    
-import datetime, time
+from sklearn import metrics
+from sklearn.decomposition import PCA
 
-import keras
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation, Flatten
-from keras.preprocessing.text import Tokenizer
-from keras.layers import Conv1D, GlobalAveragePooling1D, MaxPooling1D, BatchNormalization
+from tensorflow import keras
+from tensorflow.keras import Input
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import (
+	Activation,
+	BatchNormalization,
+	Conv1D,
+	Dense,
+	Dropout,
+	Flatten,
+	MaxPooling1D,
+)
 
 # Requirement
 # pip install deepcut
-from create_dataset_thai import content2index, load_dataset, load_dataset_unknown
+from thai_dataset import load_dataset, load_dataset_unknown
 
 MAX_WORDS = 5003
+
+
+def sequences_to_binary_matrix(sequences, num_words=MAX_WORDS):
+	"""Convert lists of word indexes to a binary bag-of-words matrix.
+
+	Replacement for the removed keras Tokenizer.sequences_to_matrix(mode='binary'):
+	output shape is (len(sequences), num_words) with 1.0 where a word index occurs.
+	"""
+	matrix = np.zeros((len(sequences), num_words))
+	for row, seq in enumerate(sequences):
+		for index in seq:
+			if 0 <= index < num_words:
+				matrix[row, index] = 1.0
+	return matrix
 
 def plotPCA2d(X, label_list, num_classes):
 	estimator = PCA(n_components=2)
@@ -45,11 +64,10 @@ def preprocessing(X_train, X_test, Y_train, Y_test, num_classes):
 	print('X_train shape:', np.shape(X_train))
 	print('X_test shape:', np.shape(X_test))	
 	
-	print('Convert sequences of words (index) to binary matrix')	
-	tokenizer = Tokenizer(num_words=MAX_WORDS)
+	print('Convert sequences of words (index) to binary matrix')
 	# Return: numpy array of shape (len(sequences), num_words).
-	X_train = tokenizer.sequences_to_matrix(X_train, mode='binary')
-	X_test = tokenizer.sequences_to_matrix(X_test, mode='binary')
+	X_train = sequences_to_binary_matrix(X_train, MAX_WORDS)
+	X_test = sequences_to_binary_matrix(X_test, MAX_WORDS)
 	print('X_train shape:', X_train.shape)
 	print('X_test shape:', X_test.shape)	
 
@@ -63,20 +81,22 @@ def preprocessing(X_train, X_test, Y_train, Y_test, num_classes):
 # Multilayer Perceptron (MLP)
 def build_MLP(num_classes):
 	model = Sequential()
-	model.add(Dense(64, input_shape=(MAX_WORDS,)))
+	model.add(Input(shape=(MAX_WORDS,)))
+	model.add(Dense(64))
 	model.add(Activation('tanh'))
 	model.add(Dropout(0.5))
 	model.add(Dense(num_classes))
 	model.add(Activation('softmax'))
 	model.compile(loss='categorical_crossentropy',
-			  optimizer='adam',
-			  metrics=['accuracy'])
+				optimizer='adam',
+				metrics=['accuracy'])
 	return model
 
 # Convolutional Neural Networks (CNN)
 def build_CNN(num_classes):
-	model = Sequential()	
-	model.add(Conv1D(filters=64, kernel_size=3, padding="same", activation='relu', input_shape=(MAX_WORDS, 1 )))
+	model = Sequential()
+	model.add(Input(shape=(MAX_WORDS, 1)))
+	model.add(Conv1D(filters=64, kernel_size=3, padding="same", activation='relu'))
 	model.add(Conv1D(filters=64, kernel_size=3, padding="same", activation='relu'))
 	model.add(MaxPooling1D(3))
 	model.add(Conv1D(filters=64, kernel_size=3, padding="same", activation='relu'))
@@ -87,15 +107,16 @@ def build_CNN(num_classes):
 	model.add(Dropout(0.5))
 	model.add(Dense(units=num_classes, activation='softmax'))
 	model.compile(loss='categorical_crossentropy',
-			  optimizer='adam',
-			  metrics=['accuracy'])
+				optimizer='adam',
+				metrics=['accuracy'])
 	return model
 
 # This model is not OK
 def build_CNN2(num_classes):
-	model = Sequential()	
-	model.add(Conv1D(filters=16, kernel_size=4, strides=1, padding="same", input_shape = (MAX_WORDS, 1)))	
-	model.add(BatchNormalization(trainable = True))	
+	model = Sequential()
+	model.add(Input(shape=(MAX_WORDS, 1)))
+	model.add(Conv1D(filters=16, kernel_size=4, strides=1, padding="same"))
+	model.add(BatchNormalization(trainable = True))
 	model.add(Activation("relu"))
 	model.add(Conv1D(filters=8, kernel_size=4, strides=1, padding="same"))	
 	model.add(BatchNormalization(trainable = True))	
@@ -108,8 +129,8 @@ def build_CNN2(num_classes):
 	model.add(Dropout(0.5))
 	model.add(Dense(num_classes, activation='softmax'))
 	model.compile(loss='categorical_crossentropy',
-			  optimizer='adam',
-			  metrics=['accuracy'])
+				optimizer='adam',
+				metrics=['accuracy'])
 	return model
 
 def decode(Y_binary):
@@ -174,25 +195,24 @@ if __name__ == "__main__":
 	train(model_CNN, XX_trainNew, XX_testNew, Y_trainNew, Y_testNew)
 	
 	# +++++++++++++++++++ For test only +++++++++++++++++++++++++++++++
-	# label 0: 	"article", label 1: "encyclopedia", label 2: "news", label 4: "novel"
-	label = ["Article", "Encyclopedia", "News", "Novel"]	
-	# I used this text file for test from : https://www.nectec.or.th/corpus/index.php?league=pm		
-	file_name = "TEST_NOVEL.txt.p"
+	# label 0: 	"article", label 1: "encyclopedia", label 2: "news", label 3: "novel"
+	label = ["Article", "Encyclopedia", "News", "Novel"]
+	# I used this text file for test from : https://www.nectec.or.th/corpus/index.php?league=pm
+	file_name = "Novel.txt.p"  # produced by running thai_dataset.py first
 	name = file_name.replace('.p', '')
 	content_index = load_dataset_unknown(file_name)
-	
+
 	# Convert sequences of words (index) to binary matrix
-	tokenizer = Tokenizer(num_words=MAX_WORDS)	
-	content_binary = tokenizer.sequences_to_matrix([content_index], mode='binary')
-	
+	content_binary = sequences_to_binary_matrix([content_index], MAX_WORDS)
+
 	print("\n Test with data that never found: ", name)
-	print('\nTesting for MPL model')		
+	print('\nTesting for MPL model')
 	index_label = test(model_MPL ,content_binary)
-	print("Predict: '%s' is '%s'" % (name , label[index_label])) 
-	
-	print('\nTesting for CNN model')		
-	input = np.reshape(content_binary, (-1, MAX_WORDS, 1)) 	
-	index_label = test(model_CNN, input)
-	print("Predict: '%s' is '%s'" % (name , label[index_label])) 
+	print("Predict: '%s' is '%s'" % (name , label[index_label]))
+
+	print('\nTesting for CNN model')
+	cnn_input = np.reshape(content_binary, (-1, MAX_WORDS, 1))
+	index_label = test(model_CNN, cnn_input)
+	print("Predict: '%s' is '%s'" % (name , label[index_label]))
 	
 	
