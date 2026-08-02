@@ -1,0 +1,18 @@
+# Core dependencies used across the examples
+numpy>=1.24
+pandas>=2.0
+scikit-learn>=1.3
+scipy>=1.10
+matplotlib>=3.7
+filterpy>=1.4.5
+tqdm>=4.65
+
+# Deep-learning examples (MNIST, GAN, RNN writer, encoders, style transfer...)
+# are big downloads, so install explicitly when you need them:
+#   pip install "tensorflow>=2.13"
+#
+# Per-example extras:
+#   pip install googlemaps        # Generative-Algorithm/Get-Data.py
+#   pip install deepcut           # Text-Classification (Thai word segmentation)
+#   pip install imageai opencv-python pillow h5py   # Object-Oriented/Detection.py
+#   pip install scikit-image opencv-python          # Text-Detection (Mask R-CNN utils)

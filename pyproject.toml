@@ -1,0 +1,25 @@
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+# Vendored third-party code is kept close to upstream and not linted
+extend-exclude = [
+    "Text-Detection",
+    "Setup/PY-Setup.py",
+]
+
+[tool.ruff.lint]
+# E: pycodestyle errors, F: pyflakes, W: warnings
+select = ["E", "F", "W"]
+ignore = [
+    "E501",  # long lines: teaching code keeps long explanatory comments
+    "E402",  # module import not at top: several lessons import mid-file on purpose
+    "E701",  # multiple statements on one line (compact axis-label lines)
+    "E741",  # ambiguous variable names like `l` used in math-heavy snippets
+    "W191",  # legacy lesson files are tab-indented; don't rewrite them wholesale
+    "W291",  # trailing whitespace in legacy files
+    "W293",  # whitespace on blank lines in legacy files
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
