@@ -5,7 +5,7 @@ import numpy as np
 def visualize(X1A, X2A, X1B, X2B, X1_all, X2_all, fxList):
 	fig, ax1 = plt.subplots()
 	#fig = plt.figure()
-	plt.gcf().canvas.set_window_title("Drawing")
+	fig.canvas.manager.set_window_title("Drawing")
 	fig.set_facecolor('#FFFFFF')
 	#ax1 = fig.add_subplot(1,2,1)
 	plotA, plotB, lnFx, lnFinal = ax1.plot([], [], 'ro', [], [], 'bo', [], [], 'g-',[], [], 'k-', animated=True)
@@ -34,3 +34,4 @@ def visualize(X1A, X2A, X1B, X2B, X1_all, X2_all, fxList):
 	ani = FuncAnimation(fig, update, 
 						init_func=init, frames=step, repeat=True, blit=True)	
 	plt.show()
+	return ani

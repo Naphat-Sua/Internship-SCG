@@ -5,7 +5,7 @@ import pandas as pd
 def show_examplePic(img, label, title , label_range=range(0,10)):	
 	fig, axarr = plt.subplots(2, 5)
 	axList = np.reshape(axarr, (2*5,))
-	plt.gcf().canvas.set_window_title(title)
+	plt.gcf().canvas.manager.set_window_title(title)
 		
 	for ax_index, num in enumerate(label_range):	
 		ax = axList[ax_index]						
@@ -22,7 +22,7 @@ def show_examplePic(img, label, title , label_range=range(0,10)):
 
 ##### CIFAR10 small image classification ##### 
 # Dataset of 50,000 32x32 color training images, labeled over 10 categories, and 10,000 test images.
-from keras.datasets import cifar10
+from tensorflow.keras.datasets import cifar10
 (x_train, y_train), (x_test, y_test) = cifar10.load_data()
 """
 Returns:
@@ -39,7 +39,7 @@ print()
 
 ##### CIFAR100 small image classification ##### 
 # Dataset of 50,000 32x32 color training images, labeled over 100 categories, and 10,000 test images.
-from keras.datasets import cifar100
+from tensorflow.keras.datasets import cifar100
 (x_train, y_train), (x_test, y_test) = cifar100.load_data(label_mode='fine')
 """
 Returns:
@@ -61,7 +61,7 @@ print()
 ##### IMDB Movie reviews sentiment classification ##### 
 # Dataset of 25,000 movies reviews from IMDB, labeled by sentiment (positive/negative). Reviews have been preprocessed, and each review is encoded as a sequence of word indexes (integers). For convenience, words are indexed by overall frequency in the dataset, so that for instance the integer "3" encodes the 3rd most frequent word in the data. This allows for quick filtering operations such as: "only consider the top 10,000 most common words, but eliminate the top 20 most common words".
 # As a convention, "0" does not stand for a specific word, but instead is used to encode any unknown word.
-from keras.datasets import imdb
+from tensorflow.keras.datasets import imdb
 (x_train, y_train), (x_test, y_test) = imdb.load_data(path="imdb.npz",
                                                       num_words=None,
                                                       skip_top=0,
@@ -94,7 +94,7 @@ print()
 
 ##### Reuters newswire topics classification ##### 
 # Dataset of 11,228 newswires from Reuters, labeled over 46 topics. As with the IMDB dataset, each wire is encoded as a sequence of word indexes (same conventions).
-from keras.datasets import reuters
+from tensorflow.keras.datasets import reuters
 (x_train, y_train), (x_test, y_test) = reuters.load_data(path="reuters.npz",
                                                          num_words=None,
                                                          skip_top=0,
@@ -126,7 +126,7 @@ print()
 
 ##### MNIST database of handwritten digits ##### 
 # Dataset of 60,000 28x28 grayscale images of the 10 digits, along with a test set of 10,000 images.
-from keras.datasets import mnist
+from tensorflow.keras.datasets import mnist
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 """
 Returns:
@@ -147,7 +147,7 @@ print()
 ##### Boston housing price regression dataset ##### 
 # Dataset taken from the StatLib library which is maintained at Carnegie Mellon University.
 # Samples contain 13 attributes of houses at different locations around the Boston suburbs in the late 1970s. Targets are the median values of the houses at a location (in k$).
-from keras.datasets import boston_housing
+from tensorflow.keras.datasets import boston_housing
 (x_train, y_train), (x_test, y_test) = boston_housing.load_data()
 """
 Arguments:

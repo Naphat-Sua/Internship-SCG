@@ -1,30 +1,25 @@
 # Linear regression
 
-1) Example predicts food truck
-2) Example predicts house price
+1) Example predicts food truck profit
+2) Example predicts Thailand population history (polynomial features)
+3) Example predicts California house prices (many features)
 
-# Nonlinear regression
+## How to run
 
-1) Example predicts Thailand population history
-2) Example predicts average income per month per household  of Thailand (B.E 41-58)
-3) Example predicts Boston house-prices 
+```bash
+cd Linear-Regression
+python Regression.py   # 7 methods compared on each dataset
+python Feature.py      # single-feature walkthrough (7 methods)
+```
 
 # Datasets
 
 | Example | Dataset file | Cites |
 | --- | --- | -- |
-| Food truck | [food_truck.csv](food_truck.csv) | [course online](https://www.coursera.org/learn/machine-learning) taught by Andrew Ng |
-| House price| [example_price_house_40_headcolumn.csv](example_price_house_40_headcolumn.csv) | |
-| Thailand population history| [Thailand_population_history.csv](Thailand_population_history.csv) | [http://countrymeters.info/en/Thailand](http://countrymeters.info/en/Thailand) |
-| Average income per month per household  of Thailand (B.E 41-58)| [average_income_per_month_per_household_41-58.csv](average_income_per_month_per_household_41-58.csv) | [https://data.go.th](https://data.go.th/DatasetDetail.aspx?id=7049410f-5bb8-4c75-9e94-112ca18b63e2&AspxAutoDetectCookieSupport=1) |
-| Boston house-prices  | use sklearn.datasets.load_boston() function load the Boston dataset instead | [Boston dataset](http://www.cs.toronto.edu/~delve/data/boston/bostonDetail.html) |
+| Food truck | [Dataset.csv](Dataset.csv) (columns: `Input`, `Output`) | [course online](https://www.coursera.org/learn/machine-learning) taught by Andrew Ng |
+| Thailand population history | [Population-Linear.csv](Population-Linear.csv) (columns: `Year`, `Population`) | [http://countrymeters.info/en/Thailand](http://countrymeters.info/en/Thailand) |
+| California housing | loaded with `sklearn.datasets.fetch_california_housing()` (sklearn removed `load_boston`) | [California housing dataset](https://scikit-learn.org/stable/datasets/real_world.html#california-housing-dataset) |
 
-
-
-
-
-
-
-
-
-
+`Income-Linear.csv` (average income per month per household of Thailand,
+B.E 41-58) is currently empty — re-download it from
+[data.go.th](https://data.go.th) if you want to run that example.

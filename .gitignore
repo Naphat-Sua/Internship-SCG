@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Editor/OS noise
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Generated outputs from the examples
+Generative-Algorithm/error.txt
+Generative-Algorithm/my-waypoints-dist-dur.csv
+Generative-Algorithm/debug_all_route.csv
+Generative-Algorithm/show_routing.html
+Recurrent-Neural-Network/temp/
+Text-Classification/pickle/
+Generative-Adversarial/mnist_generator.h5
+Generative-Adversarial/mnist_discriminator.h5
+Generative-Adversarial/MNIST_ACCURACY.png
+Generative-Adversarial/MNIST_GENERATE.png
+Convolutional-Network/ckeckpoint/
+*.mp4
+
+# Dataset caches
+scikit_learn_data/

@@ -32,7 +32,7 @@ filenames = dataset.filenames
 #print(dataset.DESCR)
 print("Shape :", np.shape(img_data))
 fig = plt.figure()
-plt.gcf().canvas.set_window_title("Sample Image")
+plt.gcf().canvas.manager.set_window_title("Sample Image")
 for position in range (1, len(img_data)+1):
 	ax = fig.add_subplot(2, 1, position)
 	ax.set_axis_off()
@@ -43,27 +43,17 @@ plt.show()
 print()
 
 
-##### Load and return the boston house-prices dataset (regression) ##### 
-from sklearn.datasets import load_boston
-boston = load_boston()
-"""
-Parameters:	
-return_X_y : boolean, default=False.
-If True, returns (data, target) instead of a Bunch object. See below for more information about the data and target object.
-New in version 0.18.
-Returns:	
-data : Bunch
-Dictionary-like object, the interesting attributes are: ‘data’, the data to learn, ‘target’, the regression targets, and ‘DESCR’, the full description of the dataset.
-(data, target) : tuple if return_X_y is True
-New in version 0.18.
-"""
-print("++++++ Boston house-prices dataset (regression) ++++++\n")
-#print(boston.DESCR)
-print("Shape X:", boston.data.shape)
-print("Shape y:", boston.target.shape)
-column_head = ["CRIM", "ZN", "INDUS", "CHAS", "NOX", "RM", "AGE" , "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT"]
-df =pd.DataFrame(columns=column_head, data=boston.data)
-df["MEDV"] = boston.target
+##### Load and return the California housing dataset (regression) #####
+# Note: sklearn removed load_boston() (ethical concerns with the dataset);
+# fetch_california_housing() is the recommended replacement.
+from sklearn.datasets import fetch_california_housing
+housing = fetch_california_housing()
+print("++++++ California housing dataset (regression) ++++++\n")
+#print(housing.DESCR)
+print("Shape X:", housing.data.shape)
+print("Shape y:", housing.target.shape)
+df = pd.DataFrame(columns=housing.feature_names, data=housing.data)
+df["MedHouseVal"] = housing.target
 print(df.head())
 print()
 
@@ -135,7 +125,7 @@ print("Shape y:", digits.target.shape)
 print()
 fig, axarr = plt.subplots(2, 5)
 axList = np.reshape(axarr, (2*5,))
-plt.gcf().canvas.set_window_title("Digits dataset")	
+plt.gcf().canvas.manager.set_window_title("Digits dataset")	
 for num in range(0,10):	
 		ax = axList[num]						
 		ax.set_title("Label: %d" % num)

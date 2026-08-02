@@ -1,26 +1,28 @@
 # My idea from this example : https://github.com/fchollet/keras/blob/master/examples/lstm_text_generation.py thanks xoxo
-from keras.models import Sequential
-from keras.layers import Dense, Activation
-from keras.layers import LSTM, GRU
-from keras.optimizers import RMSprop
-from keras.callbacks import LambdaCallback
+from tensorflow.keras import Input
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Activation
+from tensorflow.keras.layers import LSTM, GRU
+from tensorflow.keras.optimizers import RMSprop
+from tensorflow.keras.callbacks import LambdaCallback
 
+import os
 import os.path
-import shutil	
 import numpy as np
 
 # For example 1
 def build_model1(max_seqlen, encoding_len):
 	model = Sequential()
 	# Input size: (bath_num, sequences_num, dim_input)
-	model.add(LSTM(20, return_sequences=True, input_shape=(max_seqlen, encoding_len)))
+	model.add(Input(shape=(max_seqlen, encoding_len)))
+	model.add(LSTM(20, return_sequences=True))
 	model.add(LSTM(20, return_sequences=False))
 	# Fully-connected layer
 	model.add(Dense(encoding_len))
 	model.add(Activation('softmax'))
 	print(model.summary())
 
-	optimizer = RMSprop(lr=0.01)
+	optimizer = RMSprop(learning_rate=0.01)
 	model.compile(loss='categorical_crossentropy', optimizer=optimizer)
 	return model
 
@@ -29,14 +31,15 @@ def build_model2(max_seqlen, encoding_len):
 	#Build LSTM (Long short-term memory)
 	model = Sequential()
 	# Input size: (bath_num, sequences_num, dim_input)
-	model.add(GRU(40, return_sequences=True, input_shape=(max_seqlen, encoding_len)))
+	model.add(Input(shape=(max_seqlen, encoding_len)))
+	model.add(GRU(40, return_sequences=True))
 	model.add(GRU(40, return_sequences=False))
 	# Fully-connected layer
 	model.add(Dense(encoding_len))
 	model.add(Activation('softmax'))
 	print(model.summary())
 
-	optimizer = RMSprop(lr=0.01)
+	optimizer = RMSprop(learning_rate=0.01)
 	model.compile(loss='categorical_crossentropy', optimizer=optimizer)
 	return model
 
@@ -45,21 +48,20 @@ def build_model3(max_seqlen, encoding_len):
 	#Build LSTM (Long short-term memory)
 	model = Sequential()
 	# Input size: (bath_num, sequences_num, dim_input)
-	model.add(GRU(40, return_sequences=True, input_shape=(max_seqlen, encoding_len)))
+	model.add(Input(shape=(max_seqlen, encoding_len)))
+	model.add(GRU(40, return_sequences=True))
 	model.add(GRU(40, return_sequences=False))
 	# Fully-connected layer
 	model.add(Dense(encoding_len))
 	model.add(Activation('softmax'))
 	print(model.summary())
 
-	optimizer = RMSprop(lr=0.01)
+	optimizer = RMSprop(learning_rate=0.01)
 	model.compile(loss='categorical_crossentropy', optimizer=optimizer)
 	return model
 
 TEMP_PATH = 'temp'
-if os.path.exists(TEMP_PATH):
-	shutil.rmtree(TEMP_PATH)	
-os.makedirs(TEMP_PATH)
+os.makedirs(TEMP_PATH, exist_ok=True)
 
 class Vocabulary():
 	def __init__(self, tokens):
@@ -114,8 +116,7 @@ def model_generate_text(model, vocab, seq_tokens, content_length, diversity ):
 
 def get_vocabulary(content):
 	tokens = sorted(list(set(content)))
-	encoding_len = len(tokens)	
-	print("\ntokens:\n", tokens)		
+	print("\ntokens:\n", tokens)
 	return Vocabulary(tokens)
 	
 def train_model(content, max_seqlen, build_model, step=1, 
@@ -148,12 +149,11 @@ def train_model(content, max_seqlen, build_model, step=1,
 	model = build_model(max_seqlen, vocab.encoding_len)	
 	
 	# write text to files
-	def __write_text__(file_name, generate_text):		
-		file = open(os.path.join(TEMP_PATH, file_name) ,"w") 			
+	def __write_text__(file_name, generate_text):
 		text = ''.join(generate_text)
 		print('\n**** Generate text *****\n', text)
-		file.write(text)	
-		file.close()	
+		with open(os.path.join(TEMP_PATH, file_name), "w", encoding="utf-8") as file:
+			file.write(text)
 				
 	
 	all_log = {}
@@ -199,8 +199,8 @@ def train_model(content, max_seqlen, build_model, step=1,
 	print_callback = LambdaCallback(on_epoch_end=on_epoch_end)
 	
 	model.fit(X, y,
-		  batch_size=128,
-		  epochs = num_epochs,
-		  callbacks=[print_callback])
+			batch_size=128,
+			epochs = num_epochs,
+			callbacks=[print_callback])
 		
 	return	all_log, model
